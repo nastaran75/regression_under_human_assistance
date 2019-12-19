@@ -153,9 +153,9 @@ class modular_distort_greedy:
 
 	def initialize(self):
 
-		G_V = self.g.eval(self.V)
-		G_V_minus_i = np.array( [ self.g.eval( self.get_c( np.array([i])) ) for i in self.V ] )
-		min_inc_i = G_V - G_V_minus_i
+		#G_V = self.g.eval(self.V)
+		#G_V_minus_i = np.array( [ self.g.eval( self.get_c( np.array([i])) ) for i in self.V ] )
+		#min_inc_i = G_V - G_V_minus_i
 		# print min_inc_i.shape
 		# self.w =  np.array([ np.max(np.array([0.0,-min_inc_i[i]])) for i  in self.V ])
 		G_null = self.g.eval( np.array( [] ).astype(int) )
@@ -168,8 +168,8 @@ class modular_distort_greedy:
 
 		G_ascend = np.array( [ self.g.eval( np.arange(i+1) ) - self.g.eval(np.arange(i)) for i in self.V ] )
 		self.w =  np.array([ np.max(np.array([0.0,G_ascend[i]])) for i  in self.V ])
-		print 'max w ', np.max( self.w)
-		print 'min w' , np.min( self.w)
+		#print 'max w ', np.max( self.w)
+		#print 'min w' , np.min( self.w)
 
 	def eval(self,subset):
 		return self.null_val +self.w[subset].sum() # ( )

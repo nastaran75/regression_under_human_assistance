@@ -6,8 +6,7 @@ from myutil import *
 import numpy as np
 import numpy.random as rand
 import numpy.linalg as LA
-from generate_data import generate_data
-
+import getopt
 
 
 def parse_command_line_input(  list_of_file_name ):
@@ -313,6 +312,7 @@ def main():
 	list_of_std = [0.2, 0.4, 0.6, 0.8]
 
 	lamb, file_name = parse_command_line_input( list_of_file_name )
+	print 'filename',file_name
 	list_of_lamb=[ lamb ] 
 
 	list_of_K = [  0.1 , 0.2 , 0.3 , 0.4 , 0.5 , 0.6 , 0.7 , 0.8 , 0.9 ] 
@@ -322,7 +322,8 @@ def main():
 
 	obj=plot_triage_real(list_of_K, list_of_std, list_of_lamb, list_of_option, list_of_test_option)
 
-	data_file = path + 'data/' + file_name 
+	data_file = path + 'data/' + file_name
+
 
 	res_file= path + file_name + '_res'
 

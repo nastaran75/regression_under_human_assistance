@@ -16,13 +16,13 @@ class plot_triage_real:
 		self.list_of_test_option = list_of_test_option
 		self.flag_synthetic = flag_synthetic
 
-	def get_avg_error_vary_K(self,res_file,image_path):
+	def get_avg_error_vary_K(self,res_file,image_path,test_method):
 		res=load_data(res_file)
 		for std in self.list_of_std:
 			for lamb in self.list_of_lamb:
-				for test_method in self.list_of_test_option:
-					suffix='std_'+str(std)+'_lamb_'+str(lamb)+'_'+test_method
-					image_file=image_path+suffix.replace('.','_')
+				# for test_method in self.list_of_test_option:   #commented by nastaran
+				# 	suffix='std_'+str(std)+'_lamb_'+str(lamb)+'_'+test_method
+				# 	image_file=image_path+suffix.replace('.','_')
 					plot_obj={}
 					plot_arr = np.zeros( ( len( self.list_of_option) , len( self.list_of_K)))
 					for option,ind in zip(self.list_of_option, range( len(self.list_of_option)) ):
@@ -34,34 +34,38 @@ class plot_triage_real:
 							err_K_te.append(res[str(std)][str(K)][str(lamb)][option]['test_res'][test_method]['error'])
 						plot_obj[option]={'train':err_K_tr,'test':err_K_te}
 						plot_arr[ind]=np.array( err_K_te )
-					self.plot_err_vs_K(image_file,plot_obj)
+					self.plot_err_vs_K(image_path,plot_obj,test_method)
 
-	def plot_err_vary_std_K(self, res_file, res_file_txt, n):
+	def plot_err_vary_std_K(self, res_file):
 		res=load_data(res_file)
-		plot_arr= np.zeros( (self.list_of_std.shape[0], len(self.list_of_K)))
-		for std,std_ind in zip(self.list_of_std, range(self.list_of_std.shape[0] )):
+		plot_arr= np.zeros( (len(self.list_of_std), len(self.list_of_K)))
+		for std,std_ind in zip(self.list_of_std, range(len(self.list_of_std))):
 			for lamb in self.list_of_lamb:
 				for test_method in self.list_of_test_option:
 					# suffix='lamb_'+str(lamb)+'_'+test_method
 					# image_file=image_path+suffix.replace('.','_')
 					plot_obj={}
 					for option in self.list_of_option:
+						if option != 'greedy':
+							continue
+						print option
 						# err_K_tr=[]
 						err_K_te=[]
 						for K in self.list_of_K:
 							# err_K_tr.append(res[str(std)][str(K)][str(lamb)][option]['train_res']['error'])
 							err_K_te.append(res[str(std)][str(K)][str(lamb)][option]['test_res'][test_method]['error'])
 			plot_arr[std_ind]=np.array( err_K_te )
-			# plt.plot( err_K_te, label = std)
-		# plt.legend()
-		# plt.show()
+			plt.yticks([.001,.002,.003,.004])
+			plt.plot( err_K_te, label = std)
+		plt.legend()
+		plt.show()
 
 	def write_to_txt(self, res_arr, res_file_txt):
 		with open( res_file_txt, 'w') as f:
 			for row in res_arr:
 				f.write( '\t'.join(map( str, row)) + '\n' )
 
-	def plot_err_vs_K(self,image_file,plot_obj):
+	def plot_err_vs_K(self,image_file,plot_obj,test_method):
 		
 		plt.plot(plot_obj['greedy']['test'],label='GREEDY Test',linewidth=8,linestyle='--',marker='o', markersize=10,color='red')
 		plt.plot(plot_obj['distort_greedy']['test'],label='Distort Greedy Test',linewidth=8,linestyle='--',marker='o', markersize=10,color='green')
@@ -72,9 +76,14 @@ class plot_triage_real:
 		plt.legend()
 		plt.xlabel('K')
 		plt.ylabel('Average Squared Error')
-		plt.title('Average Squared Error')
+		plt.title('Synthetic - gauss - ' + test_method)
 		plt.xticks(range(len(self.list_of_K)),self.list_of_K)
+		plt.yticks([.001,.002,.003,.004])
+		plt.savefig(image_file + '.pdf', dpi=600, bbox_inches='tight')
+		plt.savefig(image_file + '.png', dpi=600, bbox_inches='tight')
 		plt.show()
+		save(plot_obj, image_file)
+		plt.close()
 		
 	def get_nearest_human(self,dist,tr_human_ind):
 		
@@ -91,6 +100,63 @@ class plot_triage_real:
 					machine_dist=d
 		# print 'Time required -----> ', time.time() - start , ' seconds'
 		return (human_dist -machine_dist)
+
+	def classification_get_test_error(self, res_obj, dist_mat, X, x, y, y_h=None, c=None, K=None):
+
+		w = res_obj['w']
+		subset = res_obj['subset']
+		n = x.shape[0]
+		tr_n = X.shape[0]
+		# n, tr_n = dist_mat.shape
+		no_human = int((subset.shape[0] * n) / float(tr_n))
+
+		y_m = x.dot(w)
+		err_m = (y - y_m) ** 2
+		if y_h == None:
+			err_h = c
+		else:
+			err_h = (y - y_h) ** 2
+
+		# start = time.time()
+		# diff_arr = [self.get_nearest_human(dist, subset) for dist in dist_mat]
+		# print 'Time required -----> ', time.time() - start , ' seconds'
+		from sklearn.neural_network import MLPClassifier
+		Y = np.zeros(X.shape[0], dtype='uint')
+		Y[subset] = 1 #human
+		model = MLPClassifier(max_iter=400)
+		model.fit(X, Y)
+		y_pred = model.predict(x)
+
+		subset_te_r = []
+		subset_machine_r = []
+		for idx, label in enumerate(y_pred):
+			if label == 1:
+				subset_te_r.append(idx)
+			else:
+				subset_machine_r.append(idx)
+		subset_machine_r = np.array(subset_machine_r)
+		subset_te_r = np.array(subset_te_r)
+
+		if subset_te_r.size == 0:
+			error_r = err_m.sum() / float(n)
+		else:
+			error_r = (err_h[subset_te_r].sum() + err_m.sum() - err_m[subset_te_r].sum()) / float(n)
+
+		subset_te_n = np.array([int(i) for i in range(len(x)) if y_pred[i] == 1])
+		# print 'subset size test', subset_te_n.shape
+		subset_machine_n = np.array([int(i) for i in range(len(x)) if i not in subset_te_n])
+		print 'sample to human--> ', str(subset_te_n.shape[0]), ', sample to machine--> ', str(
+			subset_machine_n.shape[0])
+
+		if subset_te_n.size == 0:
+			error_n = err_m.sum() / float(n)
+		else:
+			error_n = (err_h[subset_te_n].sum() + err_m.sum() - err_m[subset_te_n].sum()) / float(n)
+
+		# return {'error':error, 'human_ind':subset_te, 'machine_ind':subset_machine}
+		error_n = {'error': error_n, 'human_ind': subset_te_n, 'machine_ind': subset_machine_n}
+		error_r = {'error': error_r, 'human_ind': subset_te_r, 'machine_ind': subset_machine_r}
+		return error_n, error_r
 
 	def get_test_error(self,res_obj,dist_mat,x,y,y_h=None,c=None,K=None):
 		
@@ -185,10 +251,10 @@ class plot_triage_real:
 		error = ( err_h[subset].sum()+err_m.sum() - err_m[subset].sum() ) /float(n)
 		return {'error':error}
 
-	def compute_result(self,res_file,data_file,option, image_file_prefix ):
+	def compute_result(self,res_file,data_file,option,test_method, image_file_prefix ):
 		data=load_data(data_file)
 		res=load_data(res_file)
-		for std,i0 in zip(self.list_of_std,range(self.list_of_std.shape[0])):
+		for std,i0 in zip(self.list_of_std,range(len(self.list_of_std))):
 			for K,i1 in zip(self.list_of_K,range(len(self.list_of_K))):
 				for lamb,i2 in zip(self.list_of_lamb,range(len(self.list_of_lamb))):
 					res_obj=res[str(std)][str(K)][str(lamb)][option]
@@ -197,8 +263,13 @@ class plot_triage_real:
 					self.plot_subset_allocation( data['X'], data['Y'], res_obj['w'], res_obj['subset'], image_file )
 					print 'std', str(std), '  K', str(K), '  lamb  ', str(lamb)
 					train_res = self.get_train_error(res_obj,data['X'],data['Y'],y_h=None,c=data['c'][str(std)])
-					test_res_n,test_res_r = self.get_test_error(res_obj,data['dist_mat'],data['test']['X'],data['test']['Y'],y_h=None,c=data['test']['c'][str(std)],K=K)
-					res[str(std)][str(K)][str(lamb)][option]['test_res']={'ranking':test_res_r,'nearest':test_res_n}
+					if test_method == 'nearest':
+						test_res_n,test_res_r = self.get_test_error(res_obj,data['dist_mat'],data['test']['X'],data['test']['Y'],y_h=None,c=data['test']['c'][str(std)],K=K)
+					else:
+						test_res_n, test_res_r = self.classification_get_test_error(res_obj, data['dist_mat'], data['X'], data['test']['X'],
+																 data['test']['Y'], y_h=None,
+																 c=data['test']['c'][str(std)], K=K)
+					res[str(std)][str(K)][str(lamb)][option]['test_res']={'ranking':test_res_r,test_method:test_res_n}
 					res[str(std)][str(K)][str(lamb)][option]['train_res']=train_res
 		save(res,res_file)
 
@@ -285,22 +356,26 @@ class plot_triage_real:
 	
 
 def main():
-	list_of_std = [0.001]
+	list_of_std = [0.001]#[.01,.05]#[0.001]
 	list_of_K=[0.1,0.2,0.3,.4,0.5,.6,.7,.8,.9] 
-	list_of_lamb= [0.0001]
-	list_of_test_option = ['nearest']
+	list_of_lamb= [0.005]
+	list_of_test_option = ['nearest','classification']
 	path = '../Synthetic_data/'
-	file_name = 'sigmoid' # 'Gauss'
+	file_name = 'Gauss_n500d5' #'sigmoid' # 'Gauss'
 	data_file = path + 'data_dict_' +file_name
 	res_file = path + 'res_'+file_name
 	image_path = path + 'plot_vary_K_'+file_name
 	image_demo_prefix = path + 'demo_'+file_name
 	list_of_option=['greedy','kl_triage','distort_greedy','diff_submod']
 	obj=plot_triage_real(list_of_K, list_of_std, list_of_lamb, list_of_option, list_of_test_option)
-	for option in list_of_option:
-		obj.compute_result(res_file,data_file,option, image_demo_prefix)
-	obj.get_avg_error_vary_K(res_file,image_path)
-	# obj.plot_err_vary_std_K(res_file,res_file_txt,500)
+	for test_method in list_of_test_option:
+		for option in list_of_option:
+			if option not in ['diff_submod']:
+				obj.split_res_over_K( data_file, res_file, 0.99, option)
+			obj.compute_result(res_file,data_file,option, test_method,image_demo_prefix)
+		new_image_path = image_path + '_' + test_method
+		obj.get_avg_error_vary_K(res_file,new_image_path,test_method)
+		# obj.plot_err_vary_std_K(res_file)
 
 
 if __name__=="__main__":

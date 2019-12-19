@@ -5,8 +5,8 @@ from myutil import *
 import numpy as np
 import numpy.random as rand
 import numpy.linalg as LA
-from generate_data import generate_data 
 from triage_human_machine import triage_human_machine
+import getopt
 
 
 def parse_command_line_input( list_of_file_name ):
