@@ -251,10 +251,10 @@ class triage_human_machine:
 			# print frac
 			subset_c = self.get_c(subset)
 			# print subset_c.shape
-			c_mod_inc = c_mod.get_inc_arr(subset).flatten()
+			c_mod_inc = c_mod.get_inc_arr(subset) 
 			# print 'c',c_mod_inc.shape
 			g_inc_arr, subset_c_ret =  g.get_inc_arr(subset)
-			g_pos_inc  = g_inc_arr.flatten() + c_mod_inc
+			g_pos_inc  = g_inc_arr + c_mod_inc
 			inc_vec = frac * g_pos_inc - c_mod_inc
 			# print '------------'
 			# print subset_c.shape
@@ -302,7 +302,7 @@ class triage_human_machine:
 		# arr = np.array([int(math.ceil( (1/delta)* np.log( 1/max(delta,Submod_ratio) ))) for Submod_ratio in [.5,.6,.7,.8,.9]])
 		Submod_ratio = 0.7
 		#----------------------------------CHANGE **********************************
-		T=5#10 #  int(math.ceil( (1/delta)* np.log( 1/max(delta,Submod_ratio) ))) # check 
+		T=5 #  int(math.ceil( (1/delta)* np.log( 1/max(delta,Submod_ratio) ))) # check 
 		subset = {}
 		G_subset=[]
 		gamma = 1.0
@@ -336,9 +336,9 @@ class triage_human_machine:
 		for itr in range(self.K):
 			vector,subset_left = g.get_inc_arr(curr_set)
 			# print 'inc',np.max(vector)
-			# if np.max(vector) < 0 :
-			# 	# print 'dataset size',curr_set.shape[0]
-			# 	return curr_set
+			#if np.max(vector) < 0 :
+				# print 'dataset size',curr_set.shape[0]
+			#	return curr_set
 			idx_to_add=subset_left[np.argmax(vector)]
 			curr_set = self.get_added(curr_set,idx_to_add)
 			g.update_data_str(idx_to_add)
@@ -375,7 +375,7 @@ class triage_human_machine:
 			subset = self.kl_triage_subset()
 		if optim == 'stochastic_distort_greedy':
 			subset = self.gamma_sweep_distort_greedy(flag_stochastic=True)
-		# print 'subset_size', subset.shape
+		print 'subset_size', subset.shape
 		if subset.shape[0] == self.n:
 			w_m = 0 
 		else:
