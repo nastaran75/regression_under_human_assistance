@@ -21,19 +21,17 @@ python plot_triage_real.py -f stare5 -l 0.5 -s 0.1
 To produce Hatespeech plots:
 python plot_triage_real.py -f hatespeech -l 0.01 -s 0
 
+
 To run various algorithms:
 
 To run algorithm for Messidor dataset:
 python eval_triage.py -f messidor -l 1 -s 0.1
 
-
 To run algorithm for stare11 dataset:
 python eval_triage.py -f stare11 -l 1 -s 0.1
 
-
 To run algorithm for Stare-D dataset:
 python eval_triage.py -f stare5 -l 0.5 -s 0.1
-
 
 To run algorithm for Hatespeech dataset:
 python eval_triage.py -f hatespeech -l 0.01 -s 0
