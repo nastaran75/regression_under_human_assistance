@@ -1,3 +1,5 @@
+import sys
+
 from myutil import *
 import numpy as np
 import numpy.random as rand
@@ -12,10 +14,10 @@ class generate_data:
         self.list_of_std = list_of_std
         self.std_y = std_y
 
-    def generate_X(self):
-        self.X = rand.uniform(-7, 7, (self.n, self.dim))
+    def generate_X(self,start, end):
+        self.X = rand.uniform(start, end, (self.n, self.dim))
 
-    def white_Gauss(self, std=1):
+    def white_Gauss(self, std=0.5):
         return rand.normal(0, std, self.n)
 
     def sigmoid(self, x):
@@ -40,6 +42,16 @@ class generate_data:
         for itr, p in zip(range(no_Gauss), prob_Gauss):
             w = rand.uniform(0, 1, self.dim)
             self.Y += p * self.X.dot(w)
+
+    def generate_variable_human_prediction(self):
+        self.c = {}
+        for std in self.list_of_std:
+            self.c[str(std)] = self.variable_std_Gauss_inc(np.min(np.array(self.list_of_std)), std,
+                                                           self.X.flatten()) ** 2
+
+    def variable_std_Gauss_inc(self, low, high, x):
+        m = (high - low) / np.max(x)
+        return np.array([rand.normal(0, m * np.absolute(x_i) + low, 1)[0] for x_i in x])
 
     def generate_human_prediction(self):
 
@@ -87,6 +99,7 @@ def convert(input_data, output_data):
         return (label - pred) ** 2
 
     data = load_data(input_data, 'ifexists')
+    print input_data
     list_of_std_str = data.human_pred_train.keys()
     test = {'X': data.Xtest, 'Y': data.Ytest, 'c': {}}
     data_dict = {'test': test, 'X': data.Xtrain, 'Y': data.Ytrain, 'c': {}, 'dist_mat': data.dist_mat}
@@ -100,14 +113,14 @@ def main():
     n = 500
     dim = 5
     frac = 0.8
-    option = 'Gauss'  # Gauss' 'sigmoid'
+    option = sys.argv[1]  # gauss' 'sigmoid'
     path = '../Synthetic_data/'
 
     # generate sigmoid
     if option == 'sigmoid':
         list_of_std = np.array([0.001, 0.005, .01, .05])  # ([0.001,0.01,0.1,0.5,1])
         obj = generate_data(n, dim, list_of_std)
-        obj.generate_X()
+        obj.generate_X(-7,7)
         obj.generate_Y_sigmoid()
         obj.generate_human_prediction()
         obj.append_X()
@@ -117,21 +130,54 @@ def main():
         del obj
 
     # generate Gauss
-    if option == 'Gauss':
+    if option == 'gauss':
         std_y = 2
         list_of_std = np.array([0.001, .005, 0.01, 0.05])  # ([0.001,0.01,0.1,0.5,1])
         obj = generate_data(n, dim, list_of_std, std_y)
-        obj.generate_X()
+        obj.generate_X(-7, 7)
         obj.generate_Y_Gauss()
         obj.generate_human_prediction()
         obj.append_X()
         obj.split_data(frac)
         save(obj, path + option)
         del obj
-    input_data_file = path + 'data_' + option
-    output_data_file = path + 'data_dict_' + option
-    print 'converting'
-    convert(input_data_file, output_data_file)
+
+    if option == 'vary_sigmoid':
+        file_name = 'sigmoid_n_240_d_1_inc_noise'
+        path = '../Synthetic_Fig3/'
+        data_file = path + file_name
+        list_of_std = [0.01]  # , 0.05, 0.1, 0.5]
+        # list_of_std=np.array([0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005 ])
+        obj = generate_data(n=240, dim=1, list_of_std=list_of_std)
+        obj.generate_X(-7, 7)
+        obj.generate_Y_sigmoid()
+        obj.generate_variable_human_prediction()
+        obj.append_X()
+        full_data = {}
+        for std in list_of_std:
+            full_data[str(std)] = {'X': obj.X, 'Y': obj.Y, 'c': obj.c[str(std)]}
+        save(full_data, data_file)
+
+    if option == 'vary_gauss':
+        file_name = 'gauss_n_240_d_1_inc_noise'
+        path = '../Synthetic_Fig3/'
+        data_file = path + file_name
+        list_of_std = [0.001]  # [0.01, 0.05, 0.1, 0.5]
+        # list_of_std=np.array([0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.005 ])
+        obj = generate_data(n=240, dim=1, list_of_std=list_of_std, std_y=2)
+        obj.generate_X(-1, 1)
+        obj.generate_Y_Gauss()
+        obj.generate_variable_human_prediction()
+        obj.append_X()
+        full_data = {}
+        for std in list_of_std:
+            full_data[str(std)] = {'X': obj.X, 'Y': obj.Y, 'c': obj.c[str(std)]}
+        save(full_data, data_file)
+    if option!='vary_gauss' and option!='vary_sigmoid':
+        input_data_file = path +  option
+        output_data_file = path + 'data_dict_' + option
+        print 'converting'
+        convert(input_data_file, output_data_file)
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ def parse_command_line_input(list_of_option, list_of_file_name):
 
     std = 0.001
     lamb = 0.001
-    option = 'Gauss'
+    option = 'gauss'
     file_name = ''
 
     for opt, arg in opts:
@@ -86,10 +86,10 @@ class plot_triage_real:
                  markersize=10, color='red')
         plt.plot(plot_obj['distort_greedy']['test'], label='Distort Greedy Test', linewidth=8, linestyle='--',
                  marker='o', markersize=10, color='green')
-        plt.plot(plot_obj['diff_submod']['test'], label='DS Test', linewidth=8, linestyle='-', marker='o',
-                 markersize=10, color='blue')
-        plt.plot(plot_obj['kl_triage']['test'], label='KL Triage Test', linewidth=8, linestyle='-', marker='o',
-                 markersize=10, color='black')
+        # plt.plot(plot_obj['diff_submod']['test'], label='DS Test', linewidth=8, linestyle='-', marker='o',
+        #          markersize=10, color='blue')
+        # plt.plot(plot_obj['kl_triage']['test'], label='KL Triage Test', linewidth=8, linestyle='-', marker='o',
+        #          markersize=10, color='black')
         plt.grid()
         plt.legend()
         plt.xlabel('K')
@@ -299,8 +299,8 @@ class plot_triage_real:
 
 
 def main():
-    list_of_option = ['greedy', 'distort_greedy', 'kl_triage', 'diff_submod']
-    list_of_file_name = ['sigmoid_n500d5', 'Gauss_n500d5']
+    list_of_option = ['greedy', 'distort_greedy']#, 'kl_triage', 'diff_submod']
+    list_of_file_name = ['sigmoid', 'gauss']
 
     # specify std, lamb and file_name as specified in ReadMe.txt
     std, lamb, file_name = parse_command_line_input(list_of_option, list_of_file_name)

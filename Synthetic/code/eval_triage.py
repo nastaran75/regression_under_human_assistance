@@ -67,7 +67,7 @@ class eval_triage:
 
 def main():
     list_of_option = ['greedy', 'distort_greedy', 'kl_triage', 'diff_submod']
-    list_of_file_name = ['sigmoid_n500d5', 'Gauss_n500d5']
+    list_of_file_name = ['sigmoid', 'gauss']
 
     # specify std, lamb and file_name as specified in ReadMe.txt
     std, lamb, file_name = parse_command_line_input(list_of_option, list_of_file_name)
@@ -76,7 +76,7 @@ def main():
     list_of_lamb = [lamb]
     list_of_K = [0.1, 0.2, 0.3, .4, 0.5, .6, .7, .8, .9]
 
-    if 'Gauss' in file_name:
+    if 'gauss' in file_name:
         DG_T = 10
     if 'sigmoid' in file_name:
         DG_T = 20
