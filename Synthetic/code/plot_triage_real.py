@@ -86,15 +86,15 @@ class plot_triage_real:
                  markersize=10, color='red')
         plt.plot(plot_obj['distort_greedy']['test'], label='Distort Greedy Test', linewidth=8, linestyle='--',
                  marker='o', markersize=10, color='green')
-        # plt.plot(plot_obj['diff_submod']['test'], label='DS Test', linewidth=8, linestyle='-', marker='o',
-        #          markersize=10, color='blue')
-        # plt.plot(plot_obj['kl_triage']['test'], label='KL Triage Test', linewidth=8, linestyle='-', marker='o',
-        #          markersize=10, color='black')
+        plt.plot(plot_obj['diff_submod']['test'], label='DS Test', linewidth=8, linestyle='-', marker='o',
+                 markersize=10, color='blue')
+        plt.plot(plot_obj['kl_triage']['test'], label='KL Triage Test', linewidth=8, linestyle='-', marker='o',
+                 markersize=10, color='black')
         plt.grid()
         plt.legend()
         plt.xlabel('K')
         plt.ylabel('Average Squared Error')
-        plt.title('Synthetic - gauss - ' + test_method)
+        plt.title('Synthetic - sigmoid - ' + test_method)
         plt.xticks(range(len(self.list_of_K)), self.list_of_K)
         plt.yticks([.001, .002, .003, .004])
         plt.savefig(image_file + '.pdf', dpi=600, bbox_inches='tight')
@@ -299,8 +299,8 @@ class plot_triage_real:
 
 
 def main():
-    list_of_option = ['greedy', 'distort_greedy']#, 'kl_triage', 'diff_submod']
-    list_of_file_name = ['sigmoid', 'gauss']
+    list_of_option = ['greedy', 'distort_greedy', 'kl_triage', 'diff_submod']
+    list_of_file_name = ['sigmoid_n500d5', 'Gauss_n500d5']
 
     # specify std, lamb and file_name as specified in ReadMe.txt
     std, lamb, file_name = parse_command_line_input(list_of_option, list_of_file_name)
