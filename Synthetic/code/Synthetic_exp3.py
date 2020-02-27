@@ -61,7 +61,7 @@ class Synthetic_exp3:
 
 
 def main():
-	option = sys.argv[1]
+	option = sys.argv[1]   #'vary_sigmoid' 'vary_gauss'
 	file_name = ''
 	list_of_std = []
 	if option=='vary_sigmoid':

@@ -113,7 +113,7 @@ def main():
     n = 500
     dim = 5
     frac = 0.8
-    option = sys.argv[1]  # gauss' 'sigmoid'
+    option = sys.argv[1]  # gauss' 'sigmoid' 'vary_sigmoid' 'vary_gauss'
     path = '../Synthetic_data/'
 
     # generate sigmoid
