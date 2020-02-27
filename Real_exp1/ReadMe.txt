@@ -1,3 +1,6 @@
+Figure 4 of the paper is generated and saved in Real_Data_Results
+
+
 To run various algorithms:
 python eval_triage.py -f filename -l lambda -s error_probability -o option 
 To check plots:
