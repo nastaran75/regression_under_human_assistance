@@ -1,3 +1,8 @@
+Figure 1 of the paper is generated and saved in Synthetic_fig3
+
+Figure 2 of the paper is generated and saved in Synthetic_data
+
+
 Inside each code option,  dimension and sigma values must be specified according to paper. 
 file_name = ['sigmoid','Gaussian']
 python generate_data.py  : generate the synthetic data.
