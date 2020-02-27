@@ -80,7 +80,7 @@ def main():
 				obj=eval_triage(data_file,real_wt_std=True)
 				obj.eval_loop(param,res_file,option)	'''
 	#---------------Synthetic Data------------------------
-	s = ['sigmoid_fig_2_n500d5','gauss_fig_2_n500d5','stare5','stare11'][3]
+	s = ['sigmoid_fig_2_n500d5','gauss_fig_2_n500d5','stare5','stare11','messidor'][4]
 	if 'sigmoid' in s : # Sigmoid
 		data_file = '../Synthetic_data/data_dict_' + s
 		res_file = '../Synthetic_data/res_' + s
@@ -104,8 +104,14 @@ def main():
 		path = '../Real_Data_Results/'
 		data_file = path + 'data/' + s + '_pca50'
 		res_file = path + s + '_res_pca50'
+	if 'messidor' in s:
+		list_of_std = [.2, .4, .6, .8]
+		list_of_lamb = [0.1]
+		path = '../Real_Data_Results/'
+		data_file = path + 'data/' + s + '_pca50'
+		res_file = path + s + '_res_pca50'
 
-
+	print s
 	list_of_option =['greedy']#,'diff_submod','distort_greedy','stochastic_distort_greedy','kl_triage' ]#[int(sys.argv[2])]
 	
 

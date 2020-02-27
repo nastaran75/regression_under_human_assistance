@@ -54,9 +54,11 @@ class Synthetic_exp3:
 
 		plt.legend()
 		plt.grid(True)
+		plt.ylabel('Response (y)')
+		plt.xlabel('Features (x) ~ Unif[-7,7]')
 		plt.title('Fraction of sample to human '+str( K) )
 		print 'saved'
-		plt.savefig(image_file + '.png',dpi=600, bbox_inches='tight')
+		plt.savefig(image_file + '.pdf',dpi=600, bbox_inches='tight')
 		plt.close()
 
 

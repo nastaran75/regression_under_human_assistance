@@ -228,9 +228,15 @@ class Generate_human_error:
         for frac in list_of_frac:
             num_low = int(frac*n)
             self.data['low'][str(frac)]=indices[:num_low]
-            self.data['c'][str(frac)] = np.array( [ 0.0001 if i in self.data['low'][str(frac)] else 0.1 for i in range(n) ] )
-            self.data['test']['c'][str(frac)] = np.array( [ 0.0001 if nearest(i) in self.data['low'][str(frac)] else 0.5 for i in range( self.data['test']['X'].shape[0]) ] )
-        
+            # self.data['c'][str(frac)] = np.array( [ 0.008 if i in self.data['low'][str(frac)] else 0.05 for i in range(n) ] )
+            # self.data['test']['c'][str(frac)] = np.array( [ 0.008 if nearest(i) in self.data['low'][str(frac)] else 0.16 for i in range( self.data['test']['X'].shape[0]) ] )
+           # for stare 11   for messidor 0.001
+            self.data['c'][str(frac)] = np.array(
+                [0.0001 if i in self.data['low'][str(frac)] else 0.1 for i in range(n)])
+            self.data['test']['c'][str(frac)] = np.array(
+                [0.0001 if nearest(i) in self.data['low'][str(frac)] else 0.5 for i in
+                 range(self.data['test']['X'].shape[0])])
+
     def save_data(self, data_file):
         save( self.data , data_file)
 
@@ -265,7 +271,7 @@ def compute_dist_dict( data_file ):
 
 def main():
     path = '../Real_Data_Results/'
-    file_name = 'stare11'
+    file_name = 'messidor'
     generate_human_error( path , [file_name])
     print 'done'
     compute_dist_dict( path + 'data/' + file_name + '_pca50')

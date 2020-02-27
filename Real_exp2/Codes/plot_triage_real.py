@@ -37,9 +37,14 @@ class plot_triage_real:
 						for K in self.list_of_K:
 							err_K_tr.append(res[str(std)][str(K)][str(lamb)][option]['train_res']['error'])
 							err_K_te.append(res[str(std)][str(K)][str(lamb)][option]['test_res'][test_method]['error'])
-						plt.plot( self.list_of_K, (err_K_te), label=std)
+
+						plt.plot( self.list_of_K, (err_K_te), label=std, linewidth=8, linestyle='--', marker='o',
+                     markersize=10)
+		plt.grid()
 		plt.legend()
-		plt.savefig(res_file+'_plot.pdf')		
+		plt.xlabel('K')
+		plt.ylabel('Average Squared Error')
+		plt.savefig(res_file+'_plot.pdf')
 
 	def plot_err_vary_std_K(self, res_file, res_file_txt, n):
 		res=load_data(res_file)
@@ -305,16 +310,20 @@ def main():
 	list_of_K = [ 0.1 , 0.2 , 0.3 , 0.4 , 0.5 , 0.6 , 0.7 , 0.8 , 0.9 ] 
 	list_of_option =['greedy']
 	list_of_test_option = ['nearest']
-	file_name_list = ['stare11']#,'stare11','mesidor_re','messidor_rg','eyepac','chexpert7','chexpert8']
+	file_name_list = ['messidor']#,'stare11','mesidor_re','messidor_rg','eyepac','chexpert7','chexpert8']
 	if 'stare5' in file_name_list:
 		list_of_lamb = [0.01]  # [0.001]#
-	if 'stare11' in file_name_list:
+	elif 'stare11' in file_name_list:
 		list_of_lamb = [0.1]
+	elif 'messidor' in file_name_list:
+		list_of_lamb = [0.1]
+	else:
+		list_of_lamb = [0.005]   #[0.001] for sig [0.005] for gauss
 	path = '../Real_Data_Results/'#'../Synthetic_data/'#
 	obj=plot_triage_real(list_of_K, list_of_std, list_of_lamb, list_of_option, list_of_test_option)
 	for file_name in file_name_list:
-		data_file = path + 'data/' + file_name+'_pca50'#'../Synthetic_data/data_dict_sigmoid_fig_2_n500d5' #path + 'data/' + file_name+'_pca50'
-		res_file= path + file_name + '_res_pca50'#'../Synthetic_data/res_sigmoid_fig_2_n500d5'#
+		data_file = path + 'data/' + file_name+'_pca50'#'../Synthetic_data/data_dict_gauss_fig_2_n500d5' #path + 'data/' + file_name+'_pca50'
+		res_file= path + file_name + '_res_pca50'#'../Synthetic_data/res_gauss_fig_2_n500d5'#
 		# print('-'*50+'\n'+file_name+'\n\n'+'-'*50)
 		for option in list_of_option:
 			if True: # option not in [ 'diff_submod', 'stochastic_distort_greedy']:

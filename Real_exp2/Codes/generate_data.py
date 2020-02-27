@@ -1,3 +1,5 @@
+import sys
+
 from myutil import *
 import numpy as np
 import numpy.random as rand
@@ -115,7 +117,7 @@ def main():
 	n=500
 	dim=5
 	frac=0.8
-	option='sigmoid' #  #Gauss'
+	option=sys.argv[1] #'sigmoid' #  #Gauss'
 	path = '../Synthetic_data/'
 	s = option + '_fig_2_n'+str(n)+'d'+str(dim)
 	if option=='sigmoid':
